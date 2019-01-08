@@ -1,0 +1,19 @@
+1.
+
+select distinct country from (episodes natural join locations) where episodeof='"Game of Thrones" (2011)' order by country;
+
+2.
+
+select title, year, rank from (productions natural join ratings natural join directors) where attr is null and pid~'Hitchcock, Alfred' and votes > 50000 order by rank desc;
+
+3.
+
+with rob as (select * from roles where pid = 'Redford, Robert (I)'), paul as (select * from roles where pid = 'Newman, Paul (I)') select title, year, rank, paul.character as paulchar, paul.billing as paulbilling, rob.character as robchar, rob.billing as robbilling from ratings natural join productions natural join paul inner join rob on paul.id = rob.id where attr is NULL and not rob.character ~ 'Himself' and not paul.character ~ 'Himself';
+
+4.
+
+select pid, id, rank from (directors natural join languages natural left join ratings) where pid in (select pid from directors natural join episodes where episodeof~'Hora Marcada') and language='English' order by rank desc;
+
+5.
+
+with lucasmovie as (select id from directors where pid='Lucas, George (I)'), kurosawamovie as (select id from directors where pid='Kurosawa, Akira') select id as lucas, idlinkedto as kurosawa, relationship from links where id in (select id from lucasmovie) and idlinkedto in (select id from kurosawamovie);

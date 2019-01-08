@@ -1,0 +1,219 @@
+***Read chapter 3***
+
+Databases
+	- we use databases to answer questions
+	- storing data to keep track
+	
+Relational databases
+	- Database = structured from a Schema
+		- Relations (Tables)
+			- Relations composed of tuples
+				- Tuples contains attributes (atomic)
+				- First Normal Form = properties of the relations such that each attribute contains only indivisible(can't be sub-divided, the attributes cannot be simplified into another group) values
+				
+				Ex: Relations R
+				
+				a: type1 | b: type2
+				   (int) |   (char)
+				   
+	- Schemas: ex:
+		R(a:int, b:char)
+		
+		- Every relation has a primary key (a:int is a key)
+		
+	- Each RDBMS (relational database management system)
+		- Oracle, postgres, SQL, MySQL, SQLite, SQL server
+	
+Types
+	- INT or INTEGER
+	- REAL or FLOAT
+	- CHAR or CHAR(10) - V00806981 has 9 digits, so use CHAR(9)
+	- TEXT
+	
+	Type determines the domain, ALL potential values
+	
+Instance
+	- the actual current values that we store in the database*
+	ex: 
+	
+	   [a | b]
+		3 | 'a'
+		5 | 'x'
+		
+Functional dependencies (FDs)
+https://www.youtube.com/watch?v=1fr0BP_9-uE
+https://www.youtube.com/watch?v=ddOP5D4fagg
+
+	- Contraint between 2 sets of attributes of a relation
+		 X -> Y
+		 X and Y = set of attribute
+		 
+	ex: Given a students id, we can find student name and address
+		[sid | sname | address]
+		
+		{sid, sname -> address}
+		{sid} -> {sname}
+		{sid} -> {sid}
+		{sid} -> R
+		{sid, sname} -> R
+		
+		Thus, sid is a primary key
+		{sid} -> R and {sid, sname} -> R is a Superkey* Because it is unique for all attributes
+	
+		- A1, A2, A3, ... An -> B1, ... Bm
+		
+Functional dependencies are holding
+https://www.youtube.com/watch?v=3eHY1BZfuO4
+		
+https://www.youtube.com/watch?v=CsGalH0QKbs
+https://stackoverflow.com/questions/2718420/candidate-keys-from-functional-dependencies
+Superkey
+	- A set of attributes {A1 .. An} is a superkey of R if the set -> R
+	- ANY number of columns that create a UNIQUE row
+	
+Candidate key
+https://www.youtube.com/watch?v=QykKsqTf-M0
+	- a minimal superkey
+	- When there is no subset of C in the set such that C -> R
+	- Using the least amount of attributes to find the rest of the table
+	
+ex relation:
+	- FD = title, year -> len, genre, studio
+	- a superkey would be = title, year, len, genre, studio, starName
+	- Candidate key = title, year, starName
+	
+ex: sid, sname, netlink, address, email
+	sid -> sname, address
+	netlink -> sid
+	email -> sid
+	
+Thus, there are many superkeys, every relation should have 1 primary key = implies that it is unique, candidate key = can be a single primary key
+
+Reasoning about FDs
+	- For all instance of R satisfy all FDs in B -> Instance satisfies also A1
+		- A follows B
+		
+Armstrong Axioms
+	- Reflexitivity
+		Y subset of X, then X -> Y
+		ex: sid, sname -> sid
+		sid -> sid
+	-Augmentation
+		If X -> Y, then XZ -> YZ for any Z
+		ex: sid -> sname, then sid, address -> sname, address
+	- Transitivity
+		If X->Y, Y->Z then X->Z
+		ex: sid -> sname, and netlink -> sid, then netlink -> sname
+	- Union
+		If X->Y and X->Z, then X->YZ
+		ex: sid -> sname and sid -> address, then sid -> sname, address
+	- Decomposition
+		If X->YZ then X->Y and X->Z
+		
+Given a set f of FDs on R, if R(A1 ... An), and x subset of A1...An, and y subset of A1...An
+
+Does x -> y?
+
+Closure of attributes
+	- {A1,...,An}^+
+	https://www.youtube.com/watch?v=IUPTC65B9qE
+	
+	ex) R(A,B,C,D)
+	
+	1. put FDs in Canonical form:
+	
+	A -> B
+	B -> D
+	C -> B
+	
+	{A}^+ = {A, B, D}
+	
+Closure of sets of FDs
+https://www.youtube.com/watch?v=CP1hXCsdgcc
+http://www.cs.sfu.ca/CourseCentral/354/zaiane/material/notes/Chapter6/node12.html
+	
+	Finding the closure of FDs f^+, by using Axioms rule to derive from each other
+	
+Basis of a relation
+	Given a relation R and FDs f, we say that:
+		- any set g such that, f^+ = g^+ is a basis of R.
+		- that is the closure of sets of FDs = closure of sets of FDs g
+		
+Minimal basis (minimal cover)
+https://www.youtube.com/watch?v=6FTxqGj6mFI
+https://www.youtube.com/watch?v=Q8j4lYeVIek
+
+	minimal basis of R = basis of R
+
+	1. Put all FDs are in Canonical form (everything on the RHS to have 1 attribute)
+	2. No extraneous (useless) attributes in LHS. Get rid of all the FDs that when we can remove an attribute from the LHS.
+		- we can do this with finding the closure
+	3. No redundent FD.
+	
+	ex) Suppose F = R(A, B, C)
+	
+	FDs = 
+		A -> B
+		B -> C
+		A -> C
+		AB -> A
+		
+	1. Already in Canonical form. Everything on RHS = singleton
+	2. Since A -> B, we can rewrite AB -> A as A -> A
+	
+		** (ASIDE) another example:
+			A -> B
+			AB -> C
+			AB -> D
+			
+			rewrite as:
+			
+			A -> B
+			A -> C
+			A -> D
+			
+	3. So we have currently
+	
+		A -> B
+		B -> C
+		A -> C
+		A -> A (we ignore this reflextivity because it implies itself, or a set of itself)
+		
+	
+		Here, A -> C is redundent BECAUSE B -> C
+		
+	Therefore the minimal basis is:
+	
+	A -> B
+	B -> C
+	
+Projection of FDs
+https://www.cs.ubc.ca/~hkhosrav/db/slides/03.design%20theory.pdf
+	- See c3 notes from prof
+	
+EXAM QUESTIONS
+- FDs are given
+
+- superkeys
+- candidate keys
+- Primary keys
+- minimal basis
+- Does X -> Y element {f}+
+	- can we generate X->Y from {f}+ (translated)
+
+BCNF
+https://www.youtube.com/watch?v=F0Pi1R5Sf9E	
+	
+	- BCNF = all FDs are superkeys, IF not then decompose
+	
+FD preserving https://www.youtube.com/watch?v=GH372l7sOxY
+
+3CNF
+See notes from prof
+
+--------------------------------------------
+CH 4
+Entity relationship diagrams -> Tables
+https://www.youtube.com/watch?v=Dggxri0iYLI
+
+

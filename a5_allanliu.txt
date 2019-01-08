@@ -1,0 +1,19 @@
+1.
+
+select episodeof, avg(rank) as arank, avg(votes) as avote, count(distinct epnumber) as cepisodes, count(distinct season) as cseason from episodes natural join ratings group by episodeof having avg(rank) > 8.5 and avg(votes) > 1000 and count(distinct season) >= 4 order by avg(rank), avg(votes) desc;
+
+2.
+
+with ofmovies as (select * from ratings natural join productions where attr is null and votes >= 50000), max as (select max(rank) as rank from ofmovies) select title, year, rank, votes from ofmovies natural join max;
+
+3.
+
+with ofmovies as (select * from productions natural join ratings natural join roles where attr is null and rank >= 8 and votes >= 50000) select pid, count(id) as num, avg(rank) as rank from ofmovies group by pid having count(id) >= 10 order by avg(rank);
+
+4.
+
+with ofmovies as (select pid, count(pid) as count from roles natural join ratings natural join productions where attr is null and votes >= 50000 and rank > 8 group by pid), max as (select max(count) as count from ofmovies), combine as (select pid, id, billing, character from roles natural join ratings where votes >= 50000 and rank > 8) select pid, id, billing, character from ofmovies natural join max natural join combine;
+
+5.
+
+with goodmovies as (select * from productions natural join ratings natural join directors where attr is null and votes >= 40000), gooddirector as (select pid, count(id) as goodones, avg(rank) as avggoodones from goodmovies where rank > 8.4 group by pid), othermovies as (select pid, count(id) as rest, avg(rank) as avgrest from goodmovies where rank <= 8.4 group by pid) select pid, to_char(goodones * 100/(rest + goodones), '999G999G99D0%') as prop, rest + goodones as total, goodones, to_char(avggoodones, 'FM9.0') as avggoodones, rest, to_char(avgrest, 'FM9.0') as avgrest, to_char((avggoodones - avgrest), 'FM9.0')::float as diff from gooddirector natural join othermovies where goodones + rest >= 8 order by diff desc, prop;
